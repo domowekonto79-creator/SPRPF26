@@ -419,37 +419,39 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans p-4 md:p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-zinc-50 text-slate-900 font-sans p-4 md:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
         
         {/* Header */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
-              <div className="p-2 bg-blue-600 rounded-lg shadow-lg shadow-blue-200">
-                <FileUp className="w-6 h-6 text-white" />
-              </div>
-              SmartImport <span className="text-blue-600">Pro</span>
-            </h1>
-            <p className="text-slate-500 font-medium">Automatyczny ekstraktor danych z arkuszy Excel</p>
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-zinc-200">
+          <div className="flex items-center gap-4">
+            <div className="p-2.5 bg-slate-900 rounded-lg shadow-sm">
+              <FileUp className="w-6 h-6 text-white" />
+            </div>
+            <div className="space-y-0.5">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                Raport <span className="text-indigo-600">KNF SPRPF26 i 27</span>
+              </h1>
+              <p className="text-[13px] text-slate-500 font-medium">Automatyczny ekstraktor danych z arkuszy Excel</p>
+            </div>
           </div>
           
           {fileData && (
-            <div className="flex gap-3">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={downloadCSV}
-                className="flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-full shadow-lg shadow-blue-100 transition-all active:scale-95"
+                className="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-md transition-all active:scale-95 shadow-sm"
               >
                 <Download className="w-4 h-4" />
                 Pobierz CSV
               </button>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={exportNotes}
-                  className="flex items-center gap-2 px-4 py-2 text-[10px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-full border border-emerald-200 transition-all active:scale-95 whitespace-nowrap"
+                  className="inline-flex items-center gap-2 px-3 py-2 text-[11px] font-bold text-slate-600 bg-white hover:bg-slate-50 rounded-md border border-slate-200 transition-all active:scale-95 whitespace-nowrap shadow-sm"
                 >
-                  <FileJson className="w-3 h-3" />
+                  <FileJson className="w-3.5 h-3.5" />
                   Eksportuj notatki
                 </button>
                 <div className="relative">
@@ -460,9 +462,9 @@ export default function App() {
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                   />
                   <button
-                    className="flex items-center gap-2 px-4 py-2 text-[10px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-full border border-amber-200 transition-all active:scale-95 whitespace-nowrap w-full"
+                    className="inline-flex items-center gap-2 px-3 py-2 text-[11px] font-bold text-slate-600 bg-white hover:bg-slate-50 rounded-md border border-slate-200 transition-all active:scale-95 whitespace-nowrap w-full shadow-sm"
                   >
-                    <Upload className="w-3 h-3" />
+                    <Upload className="w-3.5 h-3.5" />
                     Importuj notatki
                   </button>
                 </div>
@@ -478,16 +480,16 @@ export default function App() {
                 />
                 <button
                   disabled={compareFilesData.length >= 5}
-                  className="flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-full border border-blue-200 transition-all active:scale-95"
+                  className="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-slate-700 bg-white hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-md border border-slate-200 transition-all active:scale-95 shadow-sm"
                 >
                   <FileUp className="w-4 h-4" />
-                  {compareFilesData.length > 0 ? "Dodaj kolejny plik do porównania" : "Importuj plik do porównania"}
+                  {compareFilesData.length > 0 ? "Dodaj kolejny plik" : "Porównaj pliki"}
                 </button>
               </div>
 
               <button
                 onClick={reset}
-                className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:text-red-600 bg-white border border-slate-200 rounded-full shadow-sm hover:shadow-md transition-all"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-md transition-all"
               >
                 <X className="w-4 h-4" />
                 Zmień plik
@@ -499,9 +501,9 @@ export default function App() {
         {!fileData ? (
           /* Step 1: Upload */
           <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative group h-[500px]"
+            className="relative group h-[450px]"
           >
             <input
               type="file"
@@ -509,79 +511,79 @@ export default function App() {
               onChange={handleFileUpload}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
             />
-            <div className="h-full border-2 border-dashed border-slate-300 group-hover:border-blue-500 bg-white rounded-[2rem] flex flex-col items-center justify-center gap-8 transition-all duration-300 shadow-xl shadow-slate-200/50">
+            <div className="h-full border border-dashed border-zinc-300 group-hover:border-indigo-500 bg-white rounded-xl flex flex-col items-center justify-center gap-8 transition-all duration-300 shadow-sm overflow-hidden">
+              <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] pointer-events-none" />
               <div className="relative">
-                <div className="absolute -inset-4 bg-blue-100 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative p-8 bg-blue-50 rounded-3xl group-hover:bg-blue-100 transition-colors">
-                  <FileUp className="w-16 h-16 text-blue-600" />
+                <div className="p-8 bg-zinc-50 rounded-2xl group-hover:bg-indigo-50 transition-colors border border-zinc-100 group-hover:border-indigo-100">
+                  <FileUp className="w-12 h-12 text-zinc-400 group-hover:text-indigo-600 transition-colors" />
                 </div>
               </div>
-              <div className="text-center space-y-3">
-                <h3 className="text-2xl font-black">Wybierz plik Excel do obróbki</h3>
-                <p className="text-slate-400 max-w-sm mx-auto leading-relaxed">
-                  Automatycznie pobieramy dane z zakładki <span className="font-bold text-slate-600">I_01.02</span>,<br />
-                  skanując kolumny <span className="font-bold text-slate-600">C, D, E</span> od 5. wiersza.
+              <div className="text-center space-y-2 relative">
+                <h3 className="text-xl font-bold text-slate-900 px-4">Wybierz plik Excel do obróbki</h3>
+                <p className="text-slate-500 text-sm max-w-sm mx-auto leading-relaxed px-4">
+                  Automatycznie pobieramy dane z zakładki <span className="font-semibold text-slate-700">I_01.02</span>,<br />
+                  skanując kolumny <span className="font-semibold text-slate-700">C, D, E</span> od 5. wiersza.
                 </p>
               </div>
-              <div className="flex gap-2">
-                <span className="px-4 py-1.5 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-full">System Expert Edition</span>
+              <div className="flex gap-2 relative">
+                <span className="px-3 py-1 bg-zinc-100 text-zinc-500 text-[10px] font-bold uppercase tracking-widest rounded border border-zinc-200">System Expert Edition</span>
               </div>
             </div>
           </motion.div>
         ) : (
           /* Step 2: Immediate Preview */
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
             {/* Stats Card */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
-                <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl">
-                  <TableIcon className="w-6 h-6" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white p-5 rounded-xl border border-zinc-200 shadow-sm flex items-center gap-4">
+                <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-lg">
+                  <TableIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Liczba mierników</p>
-                  <p className="text-xl font-black">{processedRecords.length}</p>
+                  <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Liczba mierników</p>
+                  <p className="text-lg font-bold text-slate-900">{processedRecords.length}</p>
                 </div>
               </div>
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
-                <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl">
-                  <Database className="w-6 h-6" />
+              <div className="bg-white p-5 rounded-xl border border-zinc-200 shadow-sm flex items-center gap-4">
+                <div className="p-2.5 bg-slate-50 text-slate-600 rounded-lg">
+                  <Database className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Wierszy w arkuszu</p>
-                  <p className="text-xl font-black">{fileData.rows.length}</p>
+                  <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Wierszy w arkuszu</p>
+                  <p className="text-lg font-bold text-slate-900">{fileData.rows.length}</p>
                 </div>
               </div>
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
-                <div className="p-3 bg-slate-50 text-slate-600 rounded-2xl">
-                  <Download className="w-6 h-6" />
+              <div className="bg-white p-5 rounded-xl border border-zinc-200 shadow-sm flex items-center gap-4">
+                <div className="p-2.5 bg-zinc-50 text-zinc-600 rounded-lg">
+                  <Download className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Źródło</p>
-                  <p className="text-sm font-bold truncate max-w-[150px]">{fileData.fileName}</p>
+                  <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Źródło</p>
+                  <p className="text-sm font-semibold truncate max-w-[150px] text-slate-900">{fileData.fileName}</p>
                 </div>
               </div>
             </div>
 
             {/* Main Table Preview */}
-            <div className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-200 overflow-hidden">
-              <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="bg-white rounded-xl shadow-sm border border-zinc-200 overflow-hidden">
+              <div className="p-6 border-b border-zinc-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-3">
-                    <h2 className="text-xl font-black">Wynik importu</h2>
-                    <span className="px-3 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-full uppercase tracking-tighter">Podgląd na żywo</span>
+                    <h2 className="text-lg font-bold text-slate-900 leading-none">Wynik importu</h2>
+                    <span className="px-2 py-0.5 bg-zinc-100 text-zinc-500 text-[10px] font-bold rounded uppercase tracking-wide border border-zinc-200">Podgląd na żywo</span>
                   </div>
                 </div>
 
-                <div className="flex bg-slate-100 p-1 rounded-2xl">
+                <div className="flex bg-zinc-100 p-1 rounded-lg border border-zinc-200 shadow-sm">
                   <button
                     onClick={() => setViewTab('processed')}
                     className={cn(
-                      "px-6 py-2 rounded-xl text-xs font-black transition-all uppercase tracking-widest",
-                      viewTab === 'processed' ? "bg-white text-blue-600 shadow-sm" : "text-slate-400 hover:text-slate-600"
+                      "px-5 py-1.5 rounded-md text-[11px] font-bold transition-all uppercase tracking-widest",
+                      viewTab === 'processed' ? "bg-white text-indigo-600 shadow-sm shadow-zinc-200" : "text-zinc-500 hover:text-zinc-700"
                     )}
                   >
                     Analiza Mierników
@@ -589,11 +591,11 @@ export default function App() {
                   <button
                     onClick={() => setViewTab('raw')}
                     className={cn(
-                      "px-6 py-2 rounded-xl text-xs font-black transition-all uppercase tracking-widest",
-                      viewTab === 'raw' ? "bg-white text-blue-600 shadow-sm" : "text-slate-400 hover:text-slate-600"
+                      "px-5 py-1.5 rounded-md text-[11px] font-bold transition-all uppercase tracking-widest",
+                      viewTab === 'raw' ? "bg-white text-indigo-600 shadow-sm shadow-zinc-200" : "text-zinc-500 hover:text-zinc-700"
                     )}
                   >
-                    Surowe Dane (Pełne)
+                    Surowe Dane
                   </button>
                 </div>
               </div>
@@ -603,78 +605,81 @@ export default function App() {
                   {viewTab === 'processed' ? (
                     <motion.div
                       key="processed"
-                      initial={{ opacity: 0, x: -10 }}
+                      initial={{ opacity: 0, x: -5 }}
                       animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 10 }}
-                      className="p-8 space-y-6"
+                      exit={{ opacity: 0, x: 5 }}
+                      className="p-6 space-y-6"
                     >
                       {/* Search Bar */}
-                      <div className="relative">
-                        <X className={cn("absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 cursor-pointer hover:text-red-500 transition-colors", !searchQuery && "hidden")} onClick={() => setSearchQuery('')} />
+                      <div className="relative group">
+                        <X 
+                          className={cn("absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 cursor-pointer hover:text-red-500 transition-colors z-20", !searchQuery && "hidden")} 
+                          onClick={() => setSearchQuery('')} 
+                        />
                         <input 
                           type="text" 
                           placeholder="Filtruj mierniki (nazwa, wartość...)" 
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
-                          className="w-full pl-6 pr-12 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                          className="w-full pl-6 pr-12 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder:font-normal placeholder:text-zinc-400"
                         />
                       </div>
 
                       {compareFilesData.length > 0 && (
-                        <div className="flex items-center gap-3 px-2">
+                        <div className="flex items-center gap-3 px-1">
                           <button
                             onClick={() => setShowOnlyDifferences(!showOnlyDifferences)}
                             className={cn(
-                              "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
-                              showOnlyDifferences ? "bg-blue-600" : "bg-slate-200"
+                              "relative inline-flex h-4 w-8 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
+                              showOnlyDifferences ? "bg-indigo-600" : "bg-zinc-200"
                             )}
                           >
                             <span
                               className={cn(
-                                "pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
+                                "pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out",
                                 showOnlyDifferences ? "translate-x-4" : "translate-x-0"
                               )}
                             />
                           </button>
-                          <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">Pokaż tylko różnice w wartościach</span>
+                          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Pokaż tylko różnice</span>
                         </div>
                       )}
 
-                      <div className="space-y-4">
-                        <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm p-4 -mx-4 px-8 border-b border-slate-200 flex flex-col md:flex-row gap-6 items-center mb-4">
+                      <div className="space-y-1">
+                        <div className="sticky top-0 z-20 bg-zinc-50/95 backdrop-blur-sm p-3 -mx-2 px-6 border-y border-zinc-200 flex flex-col md:flex-row gap-6 items-center">
                           <div className="flex-1 min-w-[200px]">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Miernik / Notatka</span>
+                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-1">Miernik / Notatka</span>
                           </div>
-                          <div className="flex items-center gap-0 shrink-0 overflow-x-auto pb-1 scrollbar-none">
-                            <div className="w-[240px] flex flex-col md:border-l md:border-slate-100 px-4">
-                              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block truncate text-center mb-3 px-2 py-1 bg-slate-50 rounded-lg" title={fileData?.fileName}>
+                          <div className="flex items-center gap-0 shrink-0 overflow-x-auto scrollbar-none">
+                            <div className="w-[240px] flex flex-col md:border-l md:border-zinc-200 px-4">
+                              <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest block truncate text-center mb-2 px-2 py-1 bg-white rounded border border-zinc-200 shadow-sm" title={fileData?.fileName}>
                                 {fileData?.fileName}
                               </span>
                               <div className="grid grid-cols-[80px_120px] gap-4 px-2">
-                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-tight text-center">Wartość</span>
-                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-tight">Wyjaśnienie</span>
+                                <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tight text-center">Wartość</span>
+                                <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tight">Wyjaśnienie</span>
                               </div>
                             </div>
                             
                             {compareFilesData.map((file, cIdx) => (
                               <Fragment key={cIdx}>
-                                <div className="w-[1px] h-12 bg-blue-100 shrink-0 self-center" />
+                                <div className="w-[1px] h-10 bg-zinc-200 shrink-0 self-center" />
                                 <div className="w-[240px] flex flex-col px-4 shrink-0">
-                                  <div className="flex items-center justify-between gap-2 mb-2 px-2 py-1 bg-blue-50/50 rounded-lg border border-blue-100/50">
-                                    <span className="text-[10px] font-black text-blue-600 truncate max-w-[140px] uppercase tracking-tight" title={file.fileName}>
+                                  <div className="flex items-center justify-between gap-2 mb-2 px-2 py-1 bg-indigo-50/50 rounded border border-indigo-100">
+                                    <span className="text-[10px] font-bold text-indigo-700 truncate max-w-[140px] uppercase tracking-tight" title={file.fileName}>
                                       {file.fileName}
                                     </span>
                                     <button 
                                       onClick={() => removeCompareFile(cIdx)}
-                                      className="p-1 hover:bg-red-500 hover:text-white text-blue-400 bg-white border border-blue-100 rounded-lg transition-all shadow-sm active:scale-95 shrink-0"
-                                      title="Usuń z porównania"
+                                      className="p-1 hover:bg-red-500 hover:text-white text-indigo-400 bg-white border border-indigo-100 rounded transition-all active:scale-95 shrink-0"
+                                      title="Usuń"
                                     >
                                       <X size={10} />
                                     </button>
                                   </div>
                                   <div className="grid grid-cols-[80px_120px] gap-4 px-2">
-                                    <span className="text-[9px] font-black text-blue-400/70 uppercase tracking-tight text-center">Wartość</span>
-                                    <span className="text-[9px] font-black text-blue-400/70 uppercase tracking-tight">Wyjaśnienie</span>
+                                    <span className="text-[9px] font-bold text-indigo-400/80 uppercase tracking-tight text-center">Wartość</span>
+                                    <span className="text-[9px] font-bold text-indigo-400/80 uppercase tracking-tight">Wyjaśnienie</span>
                                   </div>
                                 </div>
                               </Fragment>
@@ -683,24 +688,24 @@ export default function App() {
                         </div>
 
                         {filteredRecords.map((record, idx) => (
-                          <div key={idx} className="group p-4 bg-white hover:bg-blue-50/30 rounded-2xl border border-slate-100 transition-all flex flex-col md:flex-row gap-6 items-start md:items-center shadow-sm overflow-hidden">
+                          <div key={idx} className="group p-3 bg-white hover:bg-zinc-50 rounded-lg border-b border-zinc-100 transition-all flex flex-col md:flex-row gap-6 items-start md:items-center overflow-hidden">
                             <div className="flex-1 space-y-1 min-w-[200px] pl-2">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-[9px] font-black text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 uppercase">Miernik</span>
+                              <div className="flex items-center gap-2 mb-0.5">
+                                <span className="text-[9px] font-bold text-zinc-400 bg-white px-1.5 py-0.5 rounded border border-zinc-200 uppercase tracking-tight">Miernik</span>
                                 
                                 <div className="relative group/note">
                                   {editingNote === record.name ? (
-                                    <div className="flex items-center gap-2 bg-white border border-blue-200 rounded-lg p-1 shadow-sm">
+                                    <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded p-1 shadow-sm">
                                       <input 
                                         type="text" 
                                         value={tempNote}
                                         onChange={(e) => setTempNote(e.target.value)}
                                         placeholder="Dodaj notatkę..."
-                                        className="text-[10px] font-medium outline-none px-1 w-32"
+                                        className="text-[10px] font-medium outline-none px-1 w-36 bg-transparent"
                                         autoFocus
                                         onKeyDown={(e) => e.key === 'Enter' && saveNote(record.name)}
                                       />
-                                      <button onClick={() => saveNote(record.name)} className="text-emerald-500 hover:text-emerald-600">
+                                      <button onClick={() => saveNote(record.name)} className="text-emerald-600 hover:text-emerald-700">
                                         <Save size={12} />
                                       </button>
                                     </div>
@@ -709,41 +714,41 @@ export default function App() {
                                       <button 
                                         onClick={() => startEditing(record.name)}
                                         className={cn(
-                                          "p-1 rounded-md transition-all",
-                                          userNotes[record.name] ? "bg-blue-600 text-white shadow-sm" : "text-slate-300 hover:text-blue-500 hover:bg-blue-50"
+                                          "p-1 rounded transition-all",
+                                          userNotes[record.name] ? "bg-indigo-600 text-white shadow-sm" : "text-zinc-300 hover:text-indigo-600 hover:bg-indigo-50"
                                         )}
                                       >
                                         <StickyNote size={12} />
                                       </button>
                                       
                                       {userNotes[record.name] && (
-                                        <div className="absolute left-full ml-2 invisible group-hover/note:visible opacity-0 group-hover/note:opacity-100 transition-all z-50 bg-slate-800 text-white text-[10px] py-2 px-3 rounded-xl shadow-xl min-w-[180px] pointer-events-none">
-                                          <p className="font-bold mb-1 border-b border-slate-700 pb-1 text-[9px] text-blue-400">
-                                            TWOJA NOTATKA
+                                        <div className="absolute left-full ml-3 invisible group-hover/note:visible opacity-0 group-hover/note:opacity-100 transition-all z-50 bg-slate-900 border border-slate-700 text-white text-[11px] py-3 px-4 rounded-lg shadow-xl min-w-[200px] pointer-events-none">
+                                          <p className="font-bold mb-1.5 border-b border-slate-800 pb-1.5 text-[9px] text-indigo-400 uppercase tracking-widest">
+                                            Twoja Notatka
                                           </p>
-                                          {userNotes[record.name]}
+                                          <span className="leading-relaxed opacity-90">{userNotes[record.name]}</span>
                                         </div>
                                       )}
                                     </div>
                                   )}
                                 </div>
                               </div>
-                              <h4 className="text-slate-900 font-bold leading-snug text-sm">{record.name}</h4>
+                              <h4 className="text-slate-900 font-semibold leading-snug text-[13px]">{record.name}</h4>
                             </div>
                             
-                            <div className="flex items-center gap-0 shrink-0 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 scrollbar-none">
-                              <div className="grid grid-cols-[80px_120px] gap-4 w-[240px] px-4 md:border-l md:border-slate-100 items-center">
+                            <div className="flex items-center gap-0 shrink-0 w-full md:w-auto overflow-x-auto md:pb-0 scrollbar-none">
+                              <div className="grid grid-cols-[80px_120px] gap-4 w-[240px] px-4 md:border-l md:border-zinc-100 items-center">
                                 <div className="text-center">
-                                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 md:hidden">Wartość</p>
+                                  <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1 md:hidden text-center">Wartość</p>
                                   <p className={cn(
-                                    "text-base font-black",
-                                    record.value !== '-' ? "text-slate-900" : "text-slate-300"
+                                    "text-sm font-bold",
+                                    record.value !== '-' ? "text-slate-950 font-extrabold" : "text-zinc-300"
                                   )}>{record.value}</p>
                                 </div>
                                 
                                 <div>
-                                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 md:hidden">Wyjaśnienie</p>
-                                  <p className="text-[11px] text-slate-500 font-medium italic leading-tight line-clamp-2" title={record.note}>
+                                  <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1 md:hidden">Wyjaśnienie</p>
+                                  <p className="text-[11px] text-slate-500 font-medium italic leading-snug line-clamp-2" title={record.note}>
                                     {record.note || '-'}
                                   </p>
                                 </div>
@@ -751,19 +756,19 @@ export default function App() {
                               
                               {record.comparisons.map((comp, cIdx) => (
                                 <Fragment key={cIdx}>
-                                  <div className="w-[1px] h-10 bg-blue-100 self-center shrink-0" />
+                                  <div className="w-[1px] h-8 bg-zinc-100 self-center shrink-0" />
                                   <div className="grid grid-cols-[80px_120px] gap-4 w-[240px] px-4 items-center">
                                     <div className="text-center">
-                                      <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-1 md:hidden">Wartość</p>
+                                      <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1 md:hidden">Wartość</p>
                                       <p className={cn(
-                                        "text-base font-black",
-                                        comp.value !== '-' ? "text-blue-600" : "text-slate-300"
+                                        "text-sm font-bold",
+                                        comp.value !== '-' ? "text-indigo-600" : "text-zinc-300"
                                       )}>{comp.value}</p>
                                     </div>
                                     
                                     <div>
-                                      <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-1 md:hidden">Wyjaśnienie</p>
-                                      <p className="text-[11px] text-slate-500 font-medium italic leading-tight line-clamp-2" title={comp.note}>
+                                      <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1 md:hidden">Wyjaśnienie</p>
+                                      <p className="text-[11px] text-slate-500/80 font-medium italic leading-snug line-clamp-2" title={comp.note}>
                                         {comp.note || '-'}
                                       </p>
                                     </div>
@@ -776,44 +781,45 @@ export default function App() {
                       </div>
 
                       {filteredRecords.length === 0 && (
-                        <div className="py-20 text-center text-slate-400">
-                          Nie znaleziono mierników spełniających kryteria.
+                        <div className="py-24 text-center">
+                          <AlertCircle className="w-8 h-8 text-zinc-300 mx-auto mb-3" />
+                          <p className="text-zinc-400 text-sm font-medium">Nie znaleziono mierników spełniających kryteria.</p>
                         </div>
                       )}
                     </motion.div>
                   ) : (
                     <motion.table
                       key="raw"
-                      initial={{ opacity: 0, x: 10 }}
+                      initial={{ opacity: 0, x: 5 }}
                       animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
+                      exit={{ opacity: 0, x: -5 }}
                       className="w-full text-left border-separate border-spacing-0"
                     >
                       <thead>
-                        <tr className="bg-slate-50/50">
-                          <th className="sticky left-0 bg-slate-50 px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-r border-slate-100 w-16 text-center">#</th>
+                        <tr className="bg-zinc-50/50">
+                          <th className="sticky left-0 bg-zinc-50 border-r border-zinc-200 px-6 py-4 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] border-b w-16 text-center">#</th>
                           {fileData.headers.map((h, i) => (
-                            <th key={i} className="px-8 py-5 text-[11px] font-black text-slate-900 uppercase tracking-[0.1em] border-b border-slate-100">
+                            <th key={i} className="px-8 py-4 text-[11px] font-bold text-slate-700 uppercase tracking-[0.1em] border-b border-zinc-200">
                               <div className="flex items-center gap-2">
-                                <span className={cn("w-2 h-2 rounded-full", [2,3,4].includes(i) ? "bg-blue-500" : "bg-slate-300")} />
+                                <span className={cn("w-1.5 h-1.5 rounded-full", [2,3,4].includes(i) ? "bg-indigo-500" : "bg-zinc-300")} />
                                 {h}
                               </div>
                             </th>
                           ))}
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-50">
+                      <tbody>
                         {fileData.rows.map((row, rowIdx) => (
-                          <tr key={rowIdx} className="group hover:bg-blue-50/30 transition-colors">
-                            <td className="sticky left-0 bg-white group-hover:bg-blue-50/30 px-6 py-4 text-xs font-bold text-slate-300 border-r border-slate-100 text-center transition-colors">
-                              {rowIdx + 1}
+                          <tr key={rowIdx} className="hover:bg-zinc-50/50 transition-colors">
+                            <td className="sticky left-0 bg-white group-hover:bg-zinc-50 px-6 py-3 text-[10px] font-bold text-zinc-400 border-b border-r border-zinc-200 text-center">
+                              {rowIdx + 5}
                             </td>
                             {fileData.headers.map((_, colIdx) => (
                               <td key={colIdx} className={cn(
-                                "px-8 py-4 text-sm font-medium",
-                                [2,3,4].includes(colIdx) ? "text-slate-900" : "text-slate-400"
+                                "px-8 py-3 text-[12px] border-b border-zinc-100 max-w-[300px] truncate transition-colors",
+                                [2,3,4].includes(colIdx) ? "bg-indigo-50/10 font-bold text-slate-950" : "text-zinc-500"
                               )}>
-                                {row[colIdx]?.toString() || '-'}
+                                {row[colIdx]?.toString() || <span className="opacity-10 italic">null</span>}
                               </td>
                             ))}
                           </tr>
@@ -826,14 +832,14 @@ export default function App() {
               
               {fileData.rows.length === 0 && (
                 <div className="p-20 flex flex-col items-center justify-center text-center gap-4">
-                  <AlertCircle className="w-12 h-12 text-slate-200" />
-                  <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Brak danych w wybranym zakresie</p>
+                  <AlertCircle className="w-10 h-10 text-zinc-200" />
+                  <p className="text-zinc-400 font-bold uppercase tracking-widest text-[10px]">Brak danych w wybranym arkuszu</p>
                 </div>
               )}
             </div>
 
-            <p className="text-center text-xs text-slate-400 font-medium">
-              System automatycznie zignorował puste wiersze oraz nagłówki systemowe powyżej 5. linii.
+            <p className="text-center text-[10px] text-zinc-400 font-bold uppercase tracking-widest opacity-80 pb-8">
+              Algorytm Ekstrakcji v4.2 • I_01.02 • Col C-E • Start Row 5
             </p>
           </motion.div>
         )}
@@ -842,17 +848,14 @@ export default function App() {
 
       {/* Processing Backdrop */}
       {isProcessing && (
-        <div className="fixed inset-0 bg-slate-900/10 backdrop-blur-md z-[2000] flex items-center justify-center">
-          <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl flex flex-col items-center gap-6 text-center animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm z-[2000] flex items-center justify-center">
+          <div className="bg-white p-8 rounded-xl shadow-2xl flex flex-col items-center gap-6 text-center border border-zinc-200">
             <div className="relative">
-              <div className="w-16 h-16 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
-              </div>
+              <div className="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
             </div>
             <div className="space-y-1">
-              <p className="text-slate-900 font-black text-lg text-nowrap">Analiza arkusza I_01.02</p>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Ekstrakcja kolumn C-E od wiersza 5</p>
+              <p className="text-slate-950 font-bold text-base">Analiza danych...</p>
+              <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Ekstrakcja struktury KNF SPRPF</p>
             </div>
           </div>
         </div>
