@@ -538,24 +538,24 @@ export default function App() {
                       <div className="space-y-4">
                         {compareFilesData.length > 0 && (
                           <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm p-4 -mx-4 px-8 border-b border-slate-100 flex flex-col md:flex-row gap-6 items-center mb-6">
-                            <div className="flex-1">
+                            <div className="flex-1 min-w-[200px]">
                               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Lista Mierników</span>
                             </div>
-                            <div className="flex items-center gap-8 shrink-0 md:border-l md:border-slate-100 md:pl-8">
-                              <div className="min-w-[200px] text-center">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{fileData.fileName}</span>
+                            <div className="flex items-center gap-0 shrink-0 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200">
+                              <div className="min-w-[200px] text-center px-4">
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block truncate" title={fileData?.fileName}>{fileData?.fileName}</span>
                               </div>
                               
                               {compareFilesData.map((file, cIdx) => (
                                 <Fragment key={cIdx}>
-                                  <div className="w-[1px] h-6 bg-blue-500/30 self-center mx-2" />
-                                  <div className="min-w-[220px] flex items-center justify-between gap-3 bg-blue-50/50 px-4 py-2 rounded-xl border border-blue-100">
-                                    <span className="text-[10px] font-black text-blue-600 truncate max-w-[140px] uppercase tracking-tight" title={file.fileName}>
+                                  <div className="w-[1px] h-6 bg-blue-500/30 shrink-0" />
+                                  <div className="min-w-[240px] flex items-center justify-between gap-3 bg-blue-50/50 px-4 py-2 mx-2 rounded-xl border border-blue-100 shrink-0">
+                                    <span className="text-[10px] font-black text-blue-600 truncate max-w-[160px] uppercase tracking-tight" title={file.fileName}>
                                       {file.fileName}
                                     </span>
                                     <button 
                                       onClick={() => removeCompareFile(cIdx)}
-                                      className="p-1.5 hover:bg-red-500 hover:text-white text-blue-400 bg-white border border-blue-100 rounded-lg transition-all shadow-sm active:scale-95"
+                                      className="p-1.5 hover:bg-red-500 hover:text-white text-blue-400 bg-white border border-blue-100 rounded-lg transition-all shadow-sm active:scale-95 shrink-0"
                                       title="Usuń z porównania"
                                     >
                                       <X size={12} />
@@ -568,16 +568,16 @@ export default function App() {
                         )}
 
                         {filteredRecords.map((record, idx) => (
-                          <div key={idx} className="group p-6 bg-white hover:bg-blue-50/50 rounded-2xl border border-slate-100 transition-all flex flex-col md:flex-row gap-6 items-start md:items-center shadow-sm">
-                            <div className="flex-1 space-y-1">
+                          <div key={idx} className="group p-6 bg-white hover:bg-blue-50/50 rounded-2xl border border-slate-100 transition-all flex flex-col md:flex-row gap-6 items-start md:items-center shadow-sm overflow-hidden">
+                            <div className="flex-1 space-y-1 min-w-[200px]">
                               <div className="flex items-center gap-2">
                                 <span className="text-[10px] font-black text-blue-600 bg-blue-100 px-2 py-0.5 rounded uppercase">Nazwa miernika</span>
                               </div>
                               <h4 className="text-slate-900 font-bold leading-snug">{record.name}</h4>
                             </div>
                             
-                            <div className="flex items-center gap-8 shrink-0 w-full md:w-auto md:border-l md:border-slate-100 md:pl-8">
-                              <div className="flex items-center gap-8 min-w-[200px]">
+                            <div className="flex items-center gap-0 shrink-0 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 scrollbar-none">
+                              <div className="flex items-center gap-8 min-w-[200px] px-4 md:border-l md:border-slate-100">
                                 <div className="text-center min-w-[80px]">
                                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 md:hidden">Wartość</p>
                                   <p className={cn(
@@ -591,11 +591,11 @@ export default function App() {
                                   <p className="text-xs text-slate-500 font-medium italic leading-relaxed max-w-[150px] truncate">{record.note || '-'}</p>
                                 </div>
                               </div>
-
+                              
                               {record.comparisons.map((comp, cIdx) => (
                                 <Fragment key={cIdx}>
-                                  <div className="w-[1px] h-10 bg-blue-500/50 shadow-[0_0_8px_rgba(59,130,246,0.3)] self-center mx-2" />
-                                  <div className="flex items-center gap-8 bg-blue-50/30 p-3 rounded-xl border border-blue-100/50 min-w-[220px]">
+                                  <div className="w-[1px] h-10 bg-blue-500/50 shadow-[0_0_8px_rgba(59,130,246,0.2)] self-center shrink-0" />
+                                  <div className="flex items-center gap-8 bg-blue-50/30 p-3 mx-2 rounded-xl border border-blue-100/50 min-w-[240px] shrink-0">
                                     <div className="text-center min-w-[70px]">
                                       <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-0.5 md:hidden">Wartość</p>
                                       <p className={cn(
