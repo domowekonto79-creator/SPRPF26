@@ -175,7 +175,22 @@ export default function App() {
   };
 
   const exportNotes = () => {
-    const dataStr = JSON.stringify(userNotes, null, 2);
+    // Create a base object with ALL current indicators from combinedRecords
+    const exportData: Record<string, string> = {};
+    
+    // Add all indicators currently visible in the analysis
+    combinedRecords.forEach(r => {
+      exportData[r.name] = userNotes[r.name] || "";
+    });
+
+    // Also include any existing notes that might not be in the current view/file
+    Object.keys(userNotes).forEach(key => {
+      if (!(key in exportData)) {
+        exportData[key] = userNotes[key];
+      }
+    });
+
+    const dataStr = JSON.stringify(exportData, null, 2);
     // Use Blob with UTF-8 BOM to ensure Polish characters work in all editors
     const blob = new Blob(["\ufeff", dataStr], { type: 'application/json;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -197,14 +212,16 @@ export default function App() {
       try {
         const content = event.target?.result as string;
         const imported = JSON.parse(content);
+        
         if (typeof imported === 'object' && imported !== null) {
+          const keys = Object.keys(imported);
           setUserNotes(prev => ({ ...prev, ...imported }));
-          alert('Notatki zostały pomyślnie zaimportowane.');
+          alert(`Sukces! Zaimportowano notatki dla ${keys.length} wskaźników.`);
         } else {
           throw new Error('Nieprawidłowy format pliku');
         }
       } catch (err) {
-        alert('Błąd podczas importu notatek. Upewnij się, że plik jest poprawnym plikiem JSON.');
+        alert('Błąd podczas importu! Upewnij się, że plik jest poprawnym plikiem JSON wygenerowanym przez aplikację.');
       }
       e.target.value = '';
     };
@@ -624,42 +641,52 @@ export default function App() {
                       )}
 
                       <div className="space-y-4">
-                        {compareFilesData.length > 0 && (
-                          <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm p-4 -mx-4 px-8 border-b border-slate-100 flex flex-col md:flex-row gap-6 items-center mb-6">
-                            <div className="flex-1 min-w-[200px]">
-                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Lista Mierników</span>
-                            </div>
-                            <div className="flex items-center gap-0 shrink-0 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200">
-                              <div className="min-w-[200px] text-center px-4">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block truncate" title={fileData?.fileName}>{fileData?.fileName}</span>
+                        <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm p-4 -mx-4 px-8 border-b border-slate-200 flex flex-col md:flex-row gap-6 items-center mb-4">
+                          <div className="flex-1 min-w-[200px]">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Miernik / Notatka</span>
+                          </div>
+                          <div className="flex items-center gap-0 shrink-0 overflow-x-auto pb-1 scrollbar-none">
+                            <div className="w-[240px] flex flex-col md:border-l md:border-slate-100 px-4">
+                              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block truncate text-center mb-3 px-2 py-1 bg-slate-50 rounded-lg" title={fileData?.fileName}>
+                                {fileData?.fileName}
+                              </span>
+                              <div className="grid grid-cols-[80px_120px] gap-4 px-2">
+                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-tight text-center">Wartość</span>
+                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-tight">Wyjaśnienie</span>
                               </div>
-                              
-                              {compareFilesData.map((file, cIdx) => (
-                                <Fragment key={cIdx}>
-                                  <div className="w-[1px] h-6 bg-blue-500/30 shrink-0" />
-                                  <div className="min-w-[240px] flex items-center justify-between gap-3 bg-blue-50/50 px-4 py-2 mx-2 rounded-xl border border-blue-100 shrink-0">
-                                    <span className="text-[10px] font-black text-blue-600 truncate max-w-[160px] uppercase tracking-tight" title={file.fileName}>
+                            </div>
+                            
+                            {compareFilesData.map((file, cIdx) => (
+                              <Fragment key={cIdx}>
+                                <div className="w-[1px] h-12 bg-blue-100 shrink-0 self-center" />
+                                <div className="w-[240px] flex flex-col px-4 shrink-0">
+                                  <div className="flex items-center justify-between gap-2 mb-2 px-2 py-1 bg-blue-50/50 rounded-lg border border-blue-100/50">
+                                    <span className="text-[10px] font-black text-blue-600 truncate max-w-[140px] uppercase tracking-tight" title={file.fileName}>
                                       {file.fileName}
                                     </span>
                                     <button 
                                       onClick={() => removeCompareFile(cIdx)}
-                                      className="p-1.5 hover:bg-red-500 hover:text-white text-blue-400 bg-white border border-blue-100 rounded-lg transition-all shadow-sm active:scale-95 shrink-0"
+                                      className="p-1 hover:bg-red-500 hover:text-white text-blue-400 bg-white border border-blue-100 rounded-lg transition-all shadow-sm active:scale-95 shrink-0"
                                       title="Usuń z porównania"
                                     >
-                                      <X size={12} />
+                                      <X size={10} />
                                     </button>
                                   </div>
-                                </Fragment>
-                              ))}
-                            </div>
+                                  <div className="grid grid-cols-[80px_120px] gap-4 px-2">
+                                    <span className="text-[9px] font-black text-blue-400/70 uppercase tracking-tight text-center">Wartość</span>
+                                    <span className="text-[9px] font-black text-blue-400/70 uppercase tracking-tight">Wyjaśnienie</span>
+                                  </div>
+                                </div>
+                              </Fragment>
+                            ))}
                           </div>
-                        )}
+                        </div>
 
                         {filteredRecords.map((record, idx) => (
-                          <div key={idx} className="group p-6 bg-white hover:bg-blue-50/50 rounded-2xl border border-slate-100 transition-all flex flex-col md:flex-row gap-6 items-start md:items-center shadow-sm overflow-hidden">
-                            <div className="flex-1 space-y-1 min-w-[200px]">
-                              <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-black text-blue-600 bg-blue-100 px-2 py-0.5 rounded uppercase">Nazwa miernika</span>
+                          <div key={idx} className="group p-4 bg-white hover:bg-blue-50/30 rounded-2xl border border-slate-100 transition-all flex flex-col md:flex-row gap-6 items-start md:items-center shadow-sm overflow-hidden">
+                            <div className="flex-1 space-y-1 min-w-[200px] pl-2">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-[9px] font-black text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 uppercase">Miernik</span>
                                 
                                 <div className="relative group/note">
                                   {editingNote === record.name ? (
@@ -683,16 +710,16 @@ export default function App() {
                                         onClick={() => startEditing(record.name)}
                                         className={cn(
                                           "p-1 rounded-md transition-all",
-                                          userNotes[record.name] ? "bg-blue-600 text-white" : "text-slate-300 hover:text-blue-500 hover:bg-blue-50"
+                                          userNotes[record.name] ? "bg-blue-600 text-white shadow-sm" : "text-slate-300 hover:text-blue-500 hover:bg-blue-50"
                                         )}
                                       >
                                         <StickyNote size={12} />
                                       </button>
                                       
                                       {userNotes[record.name] && (
-                                        <div className="absolute left-full ml-2 invisible group-hover/note:visible opacity-0 group-hover/note:opacity-100 transition-all z-50 bg-slate-800 text-white text-[10px] py-2 px-3 rounded-xl shadow-xl min-w-[150px] pointer-events-none">
-                                          <p className="font-bold mb-1 border-b border-slate-700 pb-1 flex items-center justify-between">
-                                            NOTATKA
+                                        <div className="absolute left-full ml-2 invisible group-hover/note:visible opacity-0 group-hover/note:opacity-100 transition-all z-50 bg-slate-800 text-white text-[10px] py-2 px-3 rounded-xl shadow-xl min-w-[180px] pointer-events-none">
+                                          <p className="font-bold mb-1 border-b border-slate-700 pb-1 text-[9px] text-blue-400">
+                                            TWOJA NOTATKA
                                           </p>
                                           {userNotes[record.name]}
                                         </div>
@@ -701,40 +728,44 @@ export default function App() {
                                   )}
                                 </div>
                               </div>
-                              <h4 className="text-slate-900 font-bold leading-snug">{record.name}</h4>
+                              <h4 className="text-slate-900 font-bold leading-snug text-sm">{record.name}</h4>
                             </div>
                             
                             <div className="flex items-center gap-0 shrink-0 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 scrollbar-none">
-                              <div className="flex items-center gap-8 min-w-[200px] px-4 md:border-l md:border-slate-100">
-                                <div className="text-center min-w-[80px]">
-                                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 md:hidden">Wartość</p>
+                              <div className="grid grid-cols-[80px_120px] gap-4 w-[240px] px-4 md:border-l md:border-slate-100 items-center">
+                                <div className="text-center">
+                                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 md:hidden">Wartość</p>
                                   <p className={cn(
-                                    "text-lg font-black",
-                                    record.value !== '-' ? "text-blue-600" : "text-slate-400"
+                                    "text-base font-black",
+                                    record.value !== '-' ? "text-slate-900" : "text-slate-300"
                                   )}>{record.value}</p>
                                 </div>
                                 
-                                <div className="min-w-[120px]">
-                                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 md:hidden">Wyjaśnienie</p>
-                                  <p className="text-xs text-slate-500 font-medium italic leading-relaxed max-w-[150px] truncate">{record.note || '-'}</p>
+                                <div>
+                                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 md:hidden">Wyjaśnienie</p>
+                                  <p className="text-[11px] text-slate-500 font-medium italic leading-tight line-clamp-2" title={record.note}>
+                                    {record.note || '-'}
+                                  </p>
                                 </div>
                               </div>
                               
                               {record.comparisons.map((comp, cIdx) => (
                                 <Fragment key={cIdx}>
-                                  <div className="w-[1px] h-10 bg-blue-500/50 shadow-[0_0_8px_rgba(59,130,246,0.2)] self-center shrink-0" />
-                                  <div className="flex items-center gap-8 bg-blue-50/30 p-3 mx-2 rounded-xl border border-blue-100/50 min-w-[240px] shrink-0">
-                                    <div className="text-center min-w-[70px]">
-                                      <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-0.5 md:hidden">Wartość</p>
+                                  <div className="w-[1px] h-10 bg-blue-100 self-center shrink-0" />
+                                  <div className="grid grid-cols-[80px_120px] gap-4 w-[240px] px-4 items-center">
+                                    <div className="text-center">
+                                      <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-1 md:hidden">Wartość</p>
                                       <p className={cn(
                                         "text-base font-black",
-                                        comp.value !== '-' ? "text-blue-600" : "text-slate-400"
+                                        comp.value !== '-' ? "text-blue-600" : "text-slate-300"
                                       )}>{comp.value}</p>
                                     </div>
                                     
-                                    <div className="min-w-[100px]">
-                                      <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-0.5 md:hidden">Wyjaśnienie</p>
-                                      <p className="text-[10px] text-slate-500 font-medium italic leading-tight max-w-[120px] truncate">{comp.note || '-'}</p>
+                                    <div>
+                                      <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-1 md:hidden">Wyjaśnienie</p>
+                                      <p className="text-[11px] text-slate-500 font-medium italic leading-tight line-clamp-2" title={comp.note}>
+                                        {comp.note || '-'}
+                                      </p>
                                     </div>
                                   </div>
                                 </Fragment>
