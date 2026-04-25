@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, Fragment } from 'react';
+import { useState, useCallback, useMemo, Fragment, useEffect } from 'react';
 import { 
   FileUp, 
   Table as TableIcon, 
@@ -9,7 +9,12 @@ import {
   GripVertical,
   ChevronRight,
   Download,
-  Database
+  Database,
+  StickyNote,
+  Edit2,
+  Save,
+  Upload,
+  FileJson
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
@@ -148,6 +153,63 @@ export default function App() {
   const [showOnlyDifferences, setShowOnlyDifferences] = useState(false);
   const [viewTab, setViewTab] = useState<'raw' | 'processed'>('processed');
   const [searchQuery, setSearchQuery] = useState('');
+  const [userNotes, setUserNotes] = useState<Record<string, string>>(() => {
+    const saved = localStorage.getItem('smartimport_pro_notes');
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [editingNote, setEditingNote] = useState<string | null>(null);
+  const [tempNote, setTempNote] = useState('');
+
+  useEffect(() => {
+    localStorage.setItem('smartimport_pro_notes', JSON.stringify(userNotes));
+  }, [userNotes]);
+
+  const saveNote = (metricName: string) => {
+    setUserNotes(prev => ({ ...prev, [metricName]: tempNote }));
+    setEditingNote(null);
+  };
+
+  const startEditing = (metricName: string) => {
+    setTempNote(userNotes[metricName] || '');
+    setEditingNote(metricName);
+  };
+
+  const exportNotes = () => {
+    const dataStr = JSON.stringify(userNotes, null, 2);
+    // Use Blob with UTF-8 BOM to ensure Polish characters work in all editors
+    const blob = new Blob(["\ufeff", dataStr], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `backup_notatek_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const importNotes = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const content = event.target?.result as string;
+        const imported = JSON.parse(content);
+        if (typeof imported === 'object' && imported !== null) {
+          setUserNotes(prev => ({ ...prev, ...imported }));
+          alert('Notatki zostały pomyślnie zaimportowane.');
+        } else {
+          throw new Error('Nieprawidłowy format pliku');
+        }
+      } catch (err) {
+        alert('Błąd podczas importu notatek. Upewnij się, że plik jest poprawnym plikiem JSON.');
+      }
+      e.target.value = '';
+    };
+    reader.readAsText(file, 'UTF-8');
+  };
 
   // Universal processor for both files
   const processExcelData = (bstr: any, fileName: string) => {
@@ -305,12 +367,13 @@ export default function App() {
       r.name.toLowerCase().includes(q) || 
       r.value.toLowerCase().includes(q) || 
       r.note.toLowerCase().includes(q) ||
+      (userNotes[r.name] && userNotes[r.name].toLowerCase().includes(q)) ||
       r.comparisons.some(c => 
         c.value.toLowerCase().includes(q) || 
         c.note.toLowerCase().includes(q)
       )
     );
-  }, [combinedRecords, searchQuery, showOnlyDifferences, compareFilesData.length]);
+  }, [combinedRecords, searchQuery, showOnlyDifferences, compareFilesData.length, userNotes]);
 
   const downloadCSV = () => {
     if (!processedRecords.length) return;
@@ -333,8 +396,9 @@ export default function App() {
 
   const reset = () => {
     setFileData(null);
-    setCompareFileData(null);
+    setCompareFilesData([]);
     setSearchQuery('');
+    setShowOnlyDifferences(false);
   };
 
   return (
@@ -362,6 +426,30 @@ export default function App() {
                 <Download className="w-4 h-4" />
                 Pobierz CSV
               </button>
+
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={exportNotes}
+                  className="flex items-center gap-2 px-4 py-2 text-[10px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-full border border-emerald-200 transition-all active:scale-95 whitespace-nowrap"
+                >
+                  <FileJson className="w-3 h-3" />
+                  Eksportuj notatki
+                </button>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={importNotes}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
+                  <button
+                    className="flex items-center gap-2 px-4 py-2 text-[10px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-full border border-amber-200 transition-all active:scale-95 whitespace-nowrap w-full"
+                  >
+                    <Upload className="w-3 h-3" />
+                    Importuj notatki
+                  </button>
+                </div>
+              </div>
               
               <div className="relative">
                 <input
@@ -572,6 +660,46 @@ export default function App() {
                             <div className="flex-1 space-y-1 min-w-[200px]">
                               <div className="flex items-center gap-2">
                                 <span className="text-[10px] font-black text-blue-600 bg-blue-100 px-2 py-0.5 rounded uppercase">Nazwa miernika</span>
+                                
+                                <div className="relative group/note">
+                                  {editingNote === record.name ? (
+                                    <div className="flex items-center gap-2 bg-white border border-blue-200 rounded-lg p-1 shadow-sm">
+                                      <input 
+                                        type="text" 
+                                        value={tempNote}
+                                        onChange={(e) => setTempNote(e.target.value)}
+                                        placeholder="Dodaj notatkę..."
+                                        className="text-[10px] font-medium outline-none px-1 w-32"
+                                        autoFocus
+                                        onKeyDown={(e) => e.key === 'Enter' && saveNote(record.name)}
+                                      />
+                                      <button onClick={() => saveNote(record.name)} className="text-emerald-500 hover:text-emerald-600">
+                                        <Save size={12} />
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center gap-1">
+                                      <button 
+                                        onClick={() => startEditing(record.name)}
+                                        className={cn(
+                                          "p-1 rounded-md transition-all",
+                                          userNotes[record.name] ? "bg-blue-600 text-white" : "text-slate-300 hover:text-blue-500 hover:bg-blue-50"
+                                        )}
+                                      >
+                                        <StickyNote size={12} />
+                                      </button>
+                                      
+                                      {userNotes[record.name] && (
+                                        <div className="absolute left-full ml-2 invisible group-hover/note:visible opacity-0 group-hover/note:opacity-100 transition-all z-50 bg-slate-800 text-white text-[10px] py-2 px-3 rounded-xl shadow-xl min-w-[150px] pointer-events-none">
+                                          <p className="font-bold mb-1 border-b border-slate-700 pb-1 flex items-center justify-between">
+                                            NOTATKA
+                                          </p>
+                                          {userNotes[record.name]}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                               <h4 className="text-slate-900 font-bold leading-snug">{record.name}</h4>
                             </div>
