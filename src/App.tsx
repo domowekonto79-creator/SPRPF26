@@ -459,16 +459,46 @@ export default function App() {
           </div>
           
           {fileData && (
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={downloadCSV}
-                className="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-md transition-all active:scale-95 shadow-sm"
-              >
-                <Download className="w-4 h-4" />
-                Pobierz CSV
-              </button>
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={downloadCSV}
+                  className="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-md transition-all active:scale-95 shadow-sm"
+                >
+                  <Download className="w-4 h-4" />
+                  Pobierz CSV
+                </button>
 
-              <div className="flex items-center gap-2">
+                {compareFilesData.length > 0 && (
+                  <button
+                    onClick={() => {
+                      const data = filteredRecords.map(r => {
+                        const row: any = {
+                          "Miernik": r.name,
+                          "Notatka": userNotes[r.name] || '-',
+                          "Wartość": r.value
+                        };
+                        r.comparisons.forEach((c, idx) => {
+                          const fileName = compareFilesData[idx]?.fileName || `Plik ${idx + 1}`;
+                          row[`Wartość (${fileName})`] = c.value;
+                        });
+                        return row;
+                      });
+                      
+                      const ws = XLSX.utils.json_to_sheet(data);
+                      const wb = XLSX.utils.book_new();
+                      XLSX.utils.book_append_sheet(wb, ws, "Raport Zmian");
+                      XLSX.writeFile(wb, `Raport_Zmian_${new Date().toISOString().split('T')[0]}.xlsx`);
+                    } }
+                    className="inline-flex items-center gap-2 px-5 py-1.5 text-[11px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-md transition-all active:scale-95 shadow-sm border border-indigo-100 uppercase tracking-tight"
+                  >
+                    <FileJson className="w-3.5 h-3.5" />
+                    Raport Zmian
+                  </button>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-2">
                 <button
                   onClick={exportNotes}
                   className="inline-flex items-center gap-2 px-3 py-2 text-[11px] font-bold text-slate-600 bg-white hover:bg-slate-50 rounded-md border border-slate-200 transition-all active:scale-95 whitespace-nowrap shadow-sm"
