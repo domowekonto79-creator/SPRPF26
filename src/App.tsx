@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, Fragment, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, Fragment, useEffect } from 'react';
 import { 
   FileUp, 
   Table as TableIcon, 
@@ -14,7 +14,8 @@ import {
   Edit2,
   Save,
   Upload,
-  FileJson
+  FileJson,
+  Bell
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
@@ -151,11 +152,16 @@ export default function App() {
   const [compareFilesData, setCompareFilesData] = useState<RawData[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showOnlyDifferences, setShowOnlyDifferences] = useState(false);
+  const [showOnlyFlagged, setShowOnlyFlagged] = useState(false);
   const [viewTab, setViewTab] = useState<'raw' | 'processed'>('processed');
   const [searchQuery, setSearchQuery] = useState('');
   const [userNotes, setUserNotes] = useState<Record<string, string>>(() => {
     const saved = localStorage.getItem('smartimport_pro_notes');
     return saved ? JSON.parse(saved) : {};
+  });
+  const [flaggedIndicators, setFlaggedIndicators] = useState<string[]>(() => {
+    const saved = localStorage.getItem('smartimport_pro_flags');
+    return saved ? JSON.parse(saved) : [];
   });
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [tempNote, setTempNote] = useState('');
@@ -163,6 +169,18 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('smartimport_pro_notes', JSON.stringify(userNotes));
   }, [userNotes]);
+
+  useEffect(() => {
+    localStorage.setItem('smartimport_pro_flags', JSON.stringify(flaggedIndicators));
+  }, [flaggedIndicators]);
+
+  const toggleFlag = (metricName: string) => {
+    setFlaggedIndicators(prev => 
+      prev.includes(metricName) 
+        ? prev.filter(f => f !== metricName)
+        : [...prev, metricName]
+    );
+  };
 
   const saveNote = (metricName: string) => {
     setUserNotes(prev => ({ ...prev, [metricName]: tempNote }));
@@ -231,7 +249,7 @@ export default function App() {
   // Universal processor for both files
   const processExcelData = (bstr: any, fileName: string) => {
     const wb = XLSX.read(bstr, { type: 'binary' });
-    let sheetName = wb.SheetNames.find(name => name === 'I_01.02');
+    let sheetName: string | undefined = wb.SheetNames.find(name => name === 'I_01.02');
     if (!sheetName) sheetName = wb.SheetNames[wb.SheetNames.length - 1];
     
     const ws = wb.Sheets[sheetName];
@@ -378,6 +396,10 @@ export default function App() {
       );
     }
 
+    if (showOnlyFlagged) {
+      result = result.filter(r => flaggedIndicators.includes(r.name));
+    }
+
     if (!searchQuery) return result;
     const q = searchQuery.toLowerCase();
     return result.filter(r => 
@@ -390,7 +412,7 @@ export default function App() {
         c.note.toLowerCase().includes(q)
       )
     );
-  }, [combinedRecords, searchQuery, showOnlyDifferences, compareFilesData.length, userNotes]);
+  }, [combinedRecords, searchQuery, showOnlyDifferences, showOnlyFlagged, compareFilesData.length, userNotes, flaggedIndicators]);
 
   const downloadCSV = () => {
     if (!processedRecords.length) return;
@@ -625,25 +647,45 @@ export default function App() {
                         />
                       </div>
 
-                      {compareFilesData.length > 0 && (
-                        <div className="flex items-center gap-3 px-1">
+                      <div className="flex flex-wrap items-center gap-6 px-1">
+                        {compareFilesData.length > 0 && (
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => setShowOnlyDifferences(!showOnlyDifferences)}
+                              className={cn(
+                                "relative inline-flex h-4 w-8 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
+                                showOnlyDifferences ? "bg-indigo-600" : "bg-zinc-200"
+                              )}
+                            >
+                              <span
+                                className={cn(
+                                  "pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out",
+                                  showOnlyDifferences ? "translate-x-4" : "translate-x-0"
+                                )}
+                              />
+                            </button>
+                            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Pokaż tylko różnice</span>
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-3">
                           <button
-                            onClick={() => setShowOnlyDifferences(!showOnlyDifferences)}
+                            onClick={() => setShowOnlyFlagged(!showOnlyFlagged)}
                             className={cn(
                               "relative inline-flex h-4 w-8 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
-                              showOnlyDifferences ? "bg-indigo-600" : "bg-zinc-200"
+                              showOnlyFlagged ? "bg-red-500" : "bg-zinc-200"
                             )}
                           >
                             <span
                               className={cn(
                                 "pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out",
-                                showOnlyDifferences ? "translate-x-4" : "translate-x-0"
+                                showOnlyFlagged ? "translate-x-4" : "translate-x-0"
                               )}
                             />
                           </button>
-                          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Pokaż tylko różnice</span>
+                          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Oznaczone do sprawdzenia</span>
                         </div>
-                      )}
+                      </div>
 
                       <div className="space-y-1">
                         <div className="sticky top-0 z-20 bg-zinc-50/95 backdrop-blur-sm p-3 -mx-2 px-6 border-y border-zinc-200 flex flex-col md:flex-row gap-6 items-center">
@@ -688,47 +730,84 @@ export default function App() {
                         </div>
 
                         {filteredRecords.map((record, idx) => (
-                          <div key={idx} className="group p-3 bg-white hover:bg-zinc-50 rounded-lg border-b border-zinc-100 transition-all flex flex-col md:flex-row gap-6 items-start md:items-center overflow-hidden">
+                          <div key={idx} className="group p-3 bg-white hover:bg-zinc-50 rounded-lg border-b border-zinc-100 transition-all flex flex-col md:flex-row gap-6 items-start md:items-center">
                             <div className="flex-1 space-y-1 min-w-[200px] pl-2">
                               <div className="flex items-center gap-2 mb-0.5">
                                 <span className="text-[9px] font-bold text-zinc-400 bg-white px-1.5 py-0.5 rounded border border-zinc-200 uppercase tracking-tight">Miernik</span>
                                 
-                                <div className="relative group/note">
+                                <div className="">
                                   {editingNote === record.name ? (
-                                    <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded p-1 shadow-sm">
-                                      <input 
-                                        type="text" 
+                                    <div className="flex flex-col gap-2 bg-indigo-50 border border-indigo-200 rounded-lg p-2 shadow-md w-full max-w-[400px] z-[100]">
+                                      <textarea 
                                         value={tempNote}
                                         onChange={(e) => setTempNote(e.target.value)}
                                         placeholder="Dodaj notatkę..."
-                                        className="text-[10px] font-medium outline-none px-1 w-36 bg-transparent"
+                                        className="text-[11px] font-medium outline-none px-2 py-1.5 w-full bg-white border border-indigo-100 rounded min-h-[100px] leading-relaxed resize-y"
                                         autoFocus
-                                        onKeyDown={(e) => e.key === 'Enter' && saveNote(record.name)}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                                            saveNote(record.name);
+                                          }
+                                        }}
                                       />
-                                      <button onClick={() => saveNote(record.name)} className="text-emerald-600 hover:text-emerald-700">
-                                        <Save size={12} />
-                                      </button>
+                                      <div className="flex justify-between items-center px-1">
+                                        <span className="text-[9px] text-indigo-400 font-medium">Ctrl+Enter aby zapisać</span>
+                                        <div className="flex gap-2">
+                                          <button 
+                                            onClick={() => setEditingNote(null)} 
+                                            className="text-slate-400 hover:text-slate-600 text-[10px] font-bold px-2"
+                                          >
+                                            Anuluj
+                                          </button>
+                                          <button 
+                                            onClick={() => saveNote(record.name)} 
+                                            className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded text-[10px] font-bold shadow-sm transition-colors"
+                                          >
+                                            <Save size={12} />
+                                            Zapisz
+                                          </button>
+                                        </div>
+                                      </div>
                                     </div>
                                   ) : (
-                                    <div className="flex items-center gap-1">
-                                      <button 
-                                        onClick={() => startEditing(record.name)}
-                                        className={cn(
-                                          "p-1 rounded transition-all",
-                                          userNotes[record.name] ? "bg-indigo-600 text-white shadow-sm" : "text-zinc-300 hover:text-indigo-600 hover:bg-indigo-50"
-                                        )}
-                                      >
-                                        <StickyNote size={12} />
-                                      </button>
-                                      
-                                      {userNotes[record.name] && (
-                                        <div className="absolute left-full ml-3 invisible group-hover/note:visible opacity-0 group-hover/note:opacity-100 transition-all z-50 bg-slate-900 border border-slate-700 text-white text-[11px] py-3 px-4 rounded-lg shadow-xl min-w-[200px] pointer-events-none">
-                                          <p className="font-bold mb-1.5 border-b border-slate-800 pb-1.5 text-[9px] text-indigo-400 uppercase tracking-widest">
-                                            Twoja Notatka
-                                          </p>
-                                          <span className="leading-relaxed opacity-90">{userNotes[record.name]}</span>
+                                    <div className="flex items-center gap-1.5">
+                                      <div className="relative group/tooltip">
+                                        <button 
+                                          onClick={() => toggleFlag(record.name)}
+                                          className={cn(
+                                            "p-1 rounded transition-all",
+                                            flaggedIndicators.includes(record.name) 
+                                              ? "text-red-500 bg-red-50 shadow-[0_0_10px_rgba(239,68,68,0.2)]" 
+                                              : "text-zinc-300 hover:text-red-500 hover:bg-red-50"
+                                          )}
+                                        >
+                                          <Bell size={12} />
+                                        </button>
+                                        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 invisible group-hover/tooltip:visible opacity-0 group-hover/tooltip:opacity-100 transition-all z-[100] bg-slate-900 border border-slate-700 text-white text-[9px] font-bold px-2 py-1 rounded shadow-xl whitespace-nowrap pointer-events-none uppercase tracking-tight">
+                                          Oznacz do późniejszego sprawdzenia
                                         </div>
-                                      )}
+                                      </div>
+
+                                      <div className="relative group/note">
+                                        <button 
+                                          onClick={() => startEditing(record.name)}
+                                          className={cn(
+                                            "p-1 rounded transition-all",
+                                            userNotes[record.name] ? "bg-indigo-600 text-white shadow-sm" : "text-zinc-300 hover:text-indigo-600 hover:bg-indigo-50"
+                                          )}
+                                        >
+                                          <StickyNote size={12} />
+                                        </button>
+                                        
+                                        {userNotes[record.name] && (
+                                          <div className="absolute left-full ml-3 invisible group-hover/note:visible opacity-0 group-hover/note:opacity-100 transition-all z-[100] bg-slate-900 border border-slate-700 text-white text-[11px] py-3 px-4 rounded-lg shadow-2xl min-w-[200px] max-w-[320px] pointer-events-none">
+                                            <p className="font-bold mb-1.5 border-b border-slate-800 pb-1.5 text-[9px] text-indigo-400 uppercase tracking-widest">
+                                              Twoja Notatka
+                                            </p>
+                                            <span className="leading-relaxed opacity-95 whitespace-pre-wrap block">{userNotes[record.name]}</span>
+                                          </div>
+                                        )}
+                                      </div>
                                     </div>
                                   )}
                                 </div>
